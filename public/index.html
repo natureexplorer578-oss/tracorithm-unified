@@ -43,7 +43,19 @@ tr.row{cursor:pointer}tr.row:hover{background:#f6f8fa}
 .tl{border-left:2px solid var(--line);margin-left:6px;padding-left:14px}.tl div{margin-bottom:12px;position:relative}.tl div:before{content:"";position:absolute;left:-20px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--blue)}
 video,canvas,.prev{max-width:100%;border-radius:8px;background:#111}
 #toast{position:fixed;bottom:18px;right:18px;background:var(--navy);color:#fff;padding:10px 16px;border-radius:8px;z-index:9}
-@media(max-width:800px){aside{position:fixed;left:-250px;z-index:5;transition:left .2s}aside.open{left:0}#menu{display:block}#view{padding:16px}header{padding:12px 16px}}
+.big{font-size:26px;font-weight:800;margin:0}.big2{font-size:22px;margin:0 0 4px}.c{text-align:center}.grow{flex:1;text-align:center}
+.kv div{font-weight:700}.kv small{font-weight:400}
+.card.alert{background:#fff1f1;border-left:4px solid var(--red)}.card.pred{border-left:4px solid var(--blue)}
+.tile{background:#f6f8fa;border-radius:8px;padding:8px 12px;margin:10px 0;font-weight:700}.tile small{display:block;font-weight:400;color:var(--mute);font-size:12px}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:8px;background:var(--red)}.dot.g{background:var(--green)}
+.card h2{font-size:21px;margin:4px 0 6px}.txt-r{color:var(--red)}
+.aigrid{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-top:12px}
+.camwrap{position:relative;background:#111;border-radius:10px;overflow:hidden;margin-top:10px;min-height:120px}.camwrap video,.camwrap canvas{display:block;width:100%;height:auto;border-radius:0}
+.live{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.7);color:#fff;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:600}
+.msgbox{background:#f2f4f7;border-radius:8px;padding:10px 12px;margin-top:10px;color:var(--mute);font-size:14px}
+.crow{display:flex;justify-content:space-between;font-weight:600;font-size:13px}.rico{font-size:46px;line-height:1.1}
+.bar i.good{background:var(--green)}.bar i.bad{background:var(--red)}
+@media(max-width:800px){aside{position:fixed;left:-250px;z-index:5;transition:left .2s}aside.open{left:0}#menu{display:block}#view{padding:16px}header{padding:12px 16px}.aigrid{grid-template-columns:1fr}}
 </style></head><body>
 <div id="login" class="hide"><form class="lcard" id="lf" autocomplete="on">
 <div class="brand">TRACORITHM</div><div class="sub">Railway Asset Tracking &amp; AI Visual Inspection System</div>
@@ -126,10 +138,10 @@ function qrCard(id,sel){const url=location.origin+"/f/"+id;$(sel).innerHTML=`<di
 
 V.inspector=async()=>{$("#view").innerHTML=`<div class="card"><h3>Scan or find a fitting</h3><div class="row2"><input id="fid" placeholder="Fitting ID, e.g. TRC-FP-001" style="max-width:260px"><button class="btn" id="fgo">Open fitting</button><button class="btn dark" id="scan">Scan QR with camera</button><label class="btn alt" style="margin:0;cursor:pointer">Upload QR image<input id="qf" type="file" accept="image/*" class="hide"></label></div>
   <div class="err" id="se"></div><video id="sv" class="hide" playsinline muted style="margin-top:10px;width:100%;max-width:420px"></video><canvas id="sc" class="hide"></canvas></div>`;
-  const open=v=>{const m=String(v).match(/\/f\/([\w-]+)/i),id=(m?m[1]:String(v)).trim().toUpperCase();if(id)go("fitting",id)};
-  $("#fgo").onclick=()=>open($("#fid").value);$("#fid").onkeydown=e=>e.key==="Enter"&&open($("#fid").value);
+  const OLD={"INSTALL.HTML":"TRC-FP-001","RAILCLIP.HTML":"TRC-RC-003","PANDROL.HTML":"TRC-PC-002"};const open=v=>{v=String(v).trim();const m=v.match(/\/f\/([\w-]+)/i),o=v.toUpperCase().match(/(\w+\.HTML)/),id=(m?m[1]:(o&&OLD[o[1]])||v).toUpperCase();if(id)go("fitting",id)};
+  $("#fgo").onclick=()=>open($("#fid").value);$("#fid").onkeydown=e=>{if(e.key==="Enter")open($("#fid").value)};
   const decode=(src,w,h)=>{const c=$("#sc"),x=c.getContext("2d");c.width=w;c.height=h;x.drawImage(src,0,0,w,h);const r=jsQR(x.getImageData(0,0,w,h).data,w,h);return r&&r.data};
-  $("#qf").onchange=e=>{const im=new Image();im.onload=()=>{const t=decode(im,im.width,im.height);t?open(t):$("#se").textContent="No QR code found in that image."};im.src=URL.createObjectURL(e.target.files[0])};
+  $("#qf").onchange=e=>{const f=e.target.files[0];e.target.value="";if(!f)return;$("#se").textContent="Reading QR code...";const im=new Image();im.onerror=()=>{$("#se").textContent="That file could not be read as an image."};im.onload=()=>{const t=decode(im,im.width,im.height);t?open(t):$("#se").textContent="No QR code found in that image. Try a closer, sharper photo."};im.src=URL.createObjectURL(f)};
   $("#scan").onclick=async()=>{try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}})}catch{return $("#se").textContent="Camera not available. Allow camera access (needs https), or upload a QR image."}
     const v=$("#sv");v.srcObject=stream;v.classList.remove("hide");await v.play();$("#se").textContent="";
     const tick=()=>{if(!stream)return;if(v.videoWidth){const t=decode(v,v.videoWidth,v.videoHeight);if(t)return open(t)}setTimeout(tick,250)};tick()}};
@@ -148,47 +160,61 @@ V.analytics=async()=>{const a=await api("GET","/api/analytics"),i=a.inspections|
 
 V.fitting=async id=>{const r=await api("GET","/api/fittings/"+encodeURIComponent(id));
   if(!r.success){$("#view").innerHTML=`<div class="card"><b>${esc(r.message)}</b><p class="who">Check the ID or ask the manufacturer to register this fitting.</p></div>`;return}
-  const f=r.fitting,I=r.installation,S=r.schedule,P=r.prediction,inspector=can("inspector");window._f=f;
-  $("#view").innerHTML=`<div class="card"><div class="row2"><div style="flex:1"><h3 style="margin:0">${esc(f.fitting_id)}</h3>${esc(f.component)}</div>${badge(f.status)}</div></div>
-  <div class="card"><h3>Manufacturing</h3><div class="kv"><div><small>Manufacturer</small>${esc(f.manufacturer||"-")}</div><div><small>Batch / lot</small>${esc(f.batch||"-")}</div><div><small>Manufactured</small>${fd(f.mfg_date)}</div><div><small>Supplied</small>${fd(f.supply_date)}</div><div><small>Warranty</small>${f.warranty_months!=null?f.warranty_months+" months":"-"}</div></div><div id="qrbox" style="margin-top:12px"></div><button class="btn alt" id="showqr" style="margin-top:10px">Show QR code</button></div>
+  const f=r.fitting,I=r.installation,S=r.schedule,P=r.prediction,inspector=can("inspector"),od=S&&S.overdue_days>0,aiOK=inspector&&f.component!=="Pandrol Clip";
+  const smsg=!S?"":od?`The scheduled inspection is overdue by ${S.overdue_days} day(s). Immediate inspection is needed.`:S.status==="Due today"?"An inspection is due today.":"The next inspection is scheduled. No action is needed yet.";
+  $("#view").innerHTML=`<div class="card"><div class="row2"><div style="flex:1"><h1 class="big">${esc(f.fitting_id)}</h1><span class="who">${esc(f.component)}</span></div>${badge(f.status)}</div></div>
   <div id="inst"></div>
-  ${S?`<div class="card" style="border-left:4px solid ${S.overdue_days?"var(--red)":"var(--green)"}"><h3>Inspection schedule</h3>${badge(S.status)} <span class="who">Next inspection: ${fd(S.next_inspection)}${S.overdue_days?` (${S.overdue_days} day(s) overdue)`:""}</span></div>
-  <div class="card"><h3>Expected service life</h3>${badge(P.status)}<div class="kv" style="margin-top:10px"><div><small>Component age</small>${P.age_days} days</div><div><small>Remaining expected life</small>${P.remaining_days} days</div></div><p class="who">This is a time-based estimate. It does not show physical damage.</p></div>`:""}
-  ${inspector?'<div class="card" id="aic"></div>':""}
+  ${S?`<div class="card ${od?"alert":""}"><h3>Inspection Status</h3><h2 class="${od?"txt-r":""}"><i class="dot ${od?"":"g"}"></i>${od?"INSPECTION REQUIRED":S.status==="Due today"?"INSPECTION DUE TODAY":"INSPECTION ON SCHEDULE"}</h2><p style="margin:0">${smsg}</p><div class="tile"><small>Scheduled Inspection Date</small>${fd(S.next_inspection)}</div>${aiOK?'<button class="btn red" id="goai">SCAN &amp; AI ANALYSE</button>':""}</div>
+  <div class="card pred"><h3>TRACORITHM Prediction</h3><h2>${P.remaining_days<=0?"REPLACEMENT RECOMMENDED":"WITHIN EXPECTED LIFE"}</h2><p style="margin:0 0 10px">${P.remaining_days<=0?"The entered expected service life has been reached or exceeded.":"The component is within its entered expected service life."} This is a time-based estimate and does not show physical damage.</p><div class="kv"><div><small>Component Age</small>${P.age_days} days</div><div><small>Remaining Expected Life</small>${P.remaining_days} days</div></div></div>`:""}
+  ${I&&inspector?'<div class="card"><h3>Installation Control</h3><p class="who" style="margin-top:0">Resetting clears only the installation details and returns this fitting to stock. The manufacturing record, inspections and history are kept.</p><button class="btn red" id="rs">Reset Installation</button></div>':""}
+  <div class="card"><h3>Manufacturing</h3><div class="kv"><div><small>Manufacturer</small>${esc(f.manufacturer||"-")}</div><div><small>Batch / lot</small>${esc(f.batch||"-")}</div><div><small>Manufactured</small>${fd(f.mfg_date)}</div><div><small>Supplied</small>${fd(f.supply_date)}</div><div><small>Warranty</small>${f.warranty_months!=null?f.warranty_months+" months":"-"}</div></div><div id="qrbox" style="margin-top:12px"></div><button class="btn alt" id="showqr" style="margin-top:10px">Show QR code</button></div>
+  ${inspector?'<div id="aic"></div>':""}
   <div class="card"><h3>Lifecycle history</h3>${r.events.length?`<div class="tl">${r.events.map(e=>`<div><b>${esc(e.type)}</b> <span class="who">${new Date(e.at).toLocaleString()} by ${esc(e.by_user||"-")}</span><br>${esc(e.detail||"")}</div>`).join("")}</div>`:'<div class="empty">No events yet.</div>'}</div>`;
   $("#showqr").onclick=()=>{qrCard(f.fitting_id,"#qrbox");$("#showqr").remove()};
-  instBlock(f,I,inspector);if(inspector)aiBlock(f)};
+  if($("#rs"))$("#rs").onclick=async()=>{if(!confirm("Reset the installation details for "+f.fitting_id+"? Inspections and history are kept."))return;const x=await api("POST",`/api/fittings/${f.fitting_id}/reset`);x.success?go("fitting",f.fitting_id):toast(x.message)};
+  instBlock(f,I,inspector);if(inspector)aiBlock(f);
+  if($("#goai"))$("#goai").onclick=()=>$("#aic").scrollIntoView({behavior:"smooth"})};
 
-function instBlock(f,I,inspector){const box=$("#inst");
-  if(I){box.innerHTML=`<div class="card"><h3>Installation</h3><div class="kv"><div><small>Zone</small>${esc(I.zone)}</div><div><small>Division</small>${esc(I.division)}</div><div><small>Station</small>${esc(I.station)}</div><div><small>Track</small>${esc(I.track)}</div><div><small>Km location</small>${esc(I.km)}</div><div><small>Installed by</small>${esc(I.installed_by)}</div><div><small>Installation date</small>${fd(I.install_date)}</div><div><small>Pieces</small>${I.pieces}</div><div><small>Expected life</small>${I.expected_life} days</div><div><small>Inspection interval</small>${I.inspect_interval} days</div><div><small>Initial condition</small>${esc(I.condition)}</div><div><small>Notes</small>${esc(I.notes||"No notes")}</div></div>
-    ${inspector?'<p class="who">Resetting clears only the installation details. The manufacturing record, inspections and history are kept.</p><button class="btn red" id="rs">Reset installation</button>':""}</div>`;
-    if(inspector)$("#rs").onclick=async()=>{if(!confirm("Reset the installation details for "+f.fitting_id+"? Inspections and history are kept."))return;const r=await api("POST",`/api/fittings/${f.fitting_id}/reset`);r.success?go("fitting",f.fitting_id):toast(r.message)};return}
-  if(!inspector){box.innerHTML='<div class="card"><h3>Installation</h3><div class="empty">Not installed yet.</div></div>';return}
+function instBlock(f,I,inspector){const box=$("#inst"),T=(l,v)=>`<div><small>${l}</small>${esc(v)}</div>`;
+  if(I){box.innerHTML=`<div class="card"><h3 class="big2">Installation Information</h3><div class="kv" style="margin-top:10px">${T("Railway Zone",I.zone)}${T("Division",I.division)}${T("Station",I.station)}${T("Track Number",I.track)}${T("KM Location",I.km)}${T("Installed By",I.installed_by)}${T("Installation Date",fd(I.install_date))}${T("Number of Pieces",I.pieces)}${T("Expected Life",I.expected_life+" days")}${T("Inspection Interval",I.inspect_interval+" days")}${T("Initial Condition",I.condition)}${T("Condition Notes",I.notes||"No notes")}</div></div>`;return}
+  if(!inspector){box.innerHTML='<div class="card"><h3>Installation Information</h3><div class="empty">Not installed yet.</div></div>';return}
   const t=new Date(),iso=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`,F=(n,l,x="")=>`<div><label>${l}</label><input name="${n}" ${x}></div>`;
-  box.innerHTML=`<div class="card"><h3>Record installation</h3><form id="if" class="form">${F("zone","Railway zone","required")}${F("division","Division")}${F("station","Station","required")}${F("track","Track number")}${F("km","Km location")}${F("installed_by","Installed by",`value="${esc(me.name||me.username)}"`)}${F("install_date","Installation date",`type="date" required value="${iso}"`)}${F("pieces","Number of pieces",'type="number" min="1" value="1"')}${F("expected_life","Expected life (days)",'type="number" min="1" required')}${F("inspect_interval","Inspection interval (days)",'type="number" min="1" required')}
-    <div><label>Initial condition</label><select name="condition"><option>Good</option><option>Fair</option><option>Poor</option></select></div><div><label>Condition notes</label><input name="notes"></div></form><div class="err" id="ie"></div><button class="btn" id="ib">Save installation</button></div>`;
+  box.innerHTML=`<div class="card"><h3 class="big2">Installation Information</h3><p class="who" style="margin-top:0">This fitting is not installed yet. Enter the installation details.</p><form id="if" class="form">${F("zone","Railway Zone","required")}${F("division","Division")}${F("station","Station","required")}${F("track","Track Number")}${F("km","KM Location")}${F("installed_by","Installed By",`value="${esc(me.name||me.username)}"`)}${F("install_date","Installation Date",`type="date" required value="${iso}"`)}${F("pieces","Number of Pieces",'type="number" min="1" value="1"')}${F("expected_life","Expected Life (days)",'type="number" min="1" required')}${F("inspect_interval","Inspection Interval (days)",'type="number" min="1" required')}
+    <div><label>Initial Condition</label><select name="condition"><option>Good</option><option>Fair</option><option>Poor</option></select></div><div><label>Condition Notes</label><input name="notes"></div></form><div class="err" id="ie"></div><button class="btn" id="ib">Save installation</button></div>`;
   $("#ib").onclick=async()=>{const f2=$("#if");if(!f2.reportValidity())return;const r=await api("POST",`/api/fittings/${f.fitting_id}/install`,Object.fromEntries(new FormData(f2)));r.success?(toast("Installation saved"),go("fitting",f.fitting_id)):$("#ie").textContent=r.message}}
 
 /* ---------- AI inspection (runs in the browser with your Teachable Machine model) ---------- */
 function aiBlock(f){const box=$("#aic");
-  if(f.component==="Pandrol Clip"){box.innerHTML='<h3>AI visual inspection</h3><div class="empty">The trained model has no Pandrol Clip class yet, so AI inspection is not available for this component. Retrain the model with Pandrol photos to enable it.</div>';return}
-  box.innerHTML=`<h3>AI visual inspection</h3><div class="row2"><button class="btn dark" id="cam">Start camera</button><button class="btn alt hide" id="cap">Capture image</button><label class="btn alt" style="margin:0;cursor:pointer">Upload image<input id="up" type="file" accept="image/*" class="hide"></label></div>
-  <video id="av" class="hide" playsinline muted style="margin-top:10px;width:100%;max-width:420px"></video><canvas id="ac" width="224" height="224" class="hide" style="margin-top:10px"></canvas>
-  <div style="margin-top:10px"><button class="btn" id="an" disabled>Analyze with AI</button></div><div id="ar" style="margin-top:12px"></div>`;
-  const cv=$("#ac");
-  const setImg=src=>{cv.getContext("2d").drawImage(src,0,0,224,224);cv.classList.remove("hide");$("#an").disabled=false;$("#ar").innerHTML=""};
-  $("#cam").onclick=async()=>{try{stopCam();stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});const v=$("#av");v.srcObject=stream;v.classList.remove("hide");await v.play();$("#cap").classList.remove("hide")}catch{$("#ar").innerHTML='<span class="err">Camera not available. Use Upload image instead.</span>'}};
-  $("#cap").onclick=()=>{setImg($("#av"));stopCam();$("#av").classList.add("hide");$("#cap").classList.add("hide")};
-  $("#up").onchange=e=>{const im=new Image();im.onload=()=>setImg(im);im.src=URL.createObjectURL(e.target.files[0])};
-  $("#an").onclick=async()=>{const out=$("#ar");$("#an").disabled=true;out.textContent="Loading model and analyzing...";
+  if(f.component==="Pandrol Clip"){box.innerHTML='<div class="card"><h3>AI Visual Inspection</h3><div class="empty">The trained model has no Pandrol Clip class yet, so AI inspection is not available for this component. Retrain the model with Pandrol photos to enable it.</div></div>';return}
+  box.innerHTML=`<h3 class="big2">AI Visual Inspection</h3><p class="who" style="margin:0">Capture or upload a railway component image and let the trained AI model classify its condition.</p>
+  <div class="aigrid"><div class="card"><h3>Inspection Camera</h3><label style="margin-top:0">Select Railway Component</label><select disabled><option>${esc(f.component)}</option></select>
+    <div class="camwrap"><video id="av" playsinline muted></video><canvas id="ac" width="224" height="224" class="hide"></canvas><span class="live" id="lv">&#9679; LIVE CAMERA</span></div>
+    <div class="row2" style="margin-top:10px"><button class="btn alt grow" id="cap">Capture Image</button><label class="btn alt grow" style="margin:0;cursor:pointer">Upload Image<input id="up" type="file" accept="image/*" class="hide"></label></div>
+    <p class="who c" style="margin:6px 0">Upload JPG, JPEG, PNG or other image files</p><button class="btn dark full" id="an" style="margin-top:6px">Analyze with AI</button>
+    <div class="msgbox" id="am">Starting camera...</div></div>
+  <div class="card c"><h3>Inspection Result</h3><div class="rico" id="ri">&#128269;</div><h2 id="rt" style="font-size:30px">Waiting</h2><div class="who" id="rc">Confidence: --</div><div class="bar" style="margin-top:8px"><i id="rb" style="width:0"></i></div>
+    <h3 style="margin-top:16px">AI Classification</h3><div style="text-align:left">${CLASSES.map((c,i)=>`<div class="crow"><span>${c.replace(" - "," \u2014 ")}</span><span id="p${i}">0%</span></div><div class="bar"><i id="b${i}" style="width:0"></i></div>`).join("")}</div>
+    <button class="btn hide full" id="sv2">Save result to this fitting</button></div></div>`;
+  const cv=$("#ac"),vd=$("#av"),msg=t=>$("#am").textContent=t;let got=false,live=false;
+  const show=(img)=>{vd.classList.toggle("hide",img);cv.classList.toggle("hide",!img);$("#lv").classList.toggle("hide",img||!live)};
+  const reset=()=>{["rt","rc","rb"].forEach(k=>0);$("#rt").textContent="Waiting";$("#rt").style.color="";$("#ri").innerHTML="&#128269;";$("#rc").textContent="Confidence: --";$("#rb").style.width="0";$("#rb").className="";$("#sv2").classList.add("hide");CLASSES.forEach((c,i)=>{$("#p"+i).textContent="0%";$("#b"+i).style.width="0"})};
+  const cam=async()=>{try{stopCam();stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});vd.srcObject=stream;await vd.play();live=true;show(false);msg("Camera ready. Position the component and click Capture Image.")}catch{live=false;$("#lv").classList.add("hide");msg("Camera not available. Use Upload Image instead (the camera needs https).")}};
+  cam();
+  $("#cap").onclick=async()=>{if(got){got=false;$("#cap").textContent="Capture Image";reset();if(!stream)await cam();else{show(false);msg("Camera ready. Position the component and click Capture Image.")}return}
+    if(!stream||!vd.videoWidth)return msg("The camera is not ready. Use Upload Image instead.");cv.getContext("2d").drawImage(vd,0,0,224,224);got=true;show(true);$("#cap").textContent="Retake";reset();msg("Image captured. Click Analyze with AI.")};
+  $("#up").onchange=e=>{const file=e.target.files[0];e.target.value="";if(!file)return;const im=new Image();im.onerror=()=>msg("That file could not be read as an image.");
+    im.onload=()=>{cv.getContext("2d").drawImage(im,0,0,224,224);got=true;show(true);$("#cap").textContent="Retake";reset();msg("Image uploaded. Click Analyze with AI.")};im.src=URL.createObjectURL(file)};
+  $("#an").onclick=async()=>{if(!got)return msg("Capture or upload an image first.");$("#an").disabled=true;msg("Loading model and analyzing...");
     try{if(!model)model=await tf.loadLayersModel("/model/model.json");
       const p=tf.tidy(()=>model.predict(tf.browser.fromPixels(cv).toFloat().div(127).sub(1).expandDims()));const pr=Array.from(await p.data());p.dispose();
+      pr.forEach((v,i)=>{$("#p"+i).textContent=(v*100).toFixed(1)+"%";$("#b"+i).style.width=(v*100)+"%"});
       const k=pr.indexOf(Math.max(...pr)),label=CLASSES[k],comp=label.split(" - ")[0],res=label.endsWith("Good")?"GOOD":"DAMAGED",conf=pr[k]*100;
-      if(comp!==f.component){out.innerHTML=`<span class="err">The image looks like a ${esc(comp)}, but this fitting is a ${esc(f.component)}. Retake the photo of the correct component. Nothing was saved.</span>`;$("#an").disabled=false;return}
-      ai={res,conf};out.innerHTML=`<div class="kv"><div><small>Component</small>${esc(f.component)}</div><div><small>Predicted condition</small>${badge(res)}</div><div><small>Confidence</small>${conf.toFixed(1)}%</div><div><small>Analyzed</small>${new Date().toLocaleString()}</div></div>
-      <div style="margin-top:10px"><button class="btn" id="sv2">Save result to this fitting</button></div>`;
-      $("#sv2").onclick=async()=>{const r=await api("POST",`/api/fittings/${f.fitting_id}/inspection`,{result:ai.res,confidence:ai.conf});r.success?(toast("Inspection saved"),go("fitting",f.fitting_id)):toast(r.message)}}
-    catch(e){console.error(e);out.innerHTML='<span class="err">The AI model could not run. Check that public/model/ contains model.json, metadata.json and weights.bin.</span>';$("#an").disabled=false}}}
+      if(comp!==f.component){msg(`The image looks like a ${comp}, but this fitting is a ${f.component}. Retake the photo of the correct component. Nothing was saved.`);return}
+      ai={res,conf};$("#rt").textContent=res;$("#rt").style.color=res==="GOOD"?"var(--green)":"var(--red)";$("#ri").innerHTML=res==="GOOD"?"&#9989;":"&#9888;&#65039;";
+      $("#rc").textContent="Confidence: "+conf.toFixed(1)+"%";$("#rb").style.width=conf+"%";$("#rb").className=res==="GOOD"?"good":"bad";$("#sv2").classList.remove("hide");
+      msg("Analysis complete at "+new Date().toLocaleString()+". Click Save result to keep it on this fitting.")}
+    catch(e){console.error(e);msg("The AI model could not run. Check that public/model/ contains model.json, metadata.json and weights.bin.")}finally{$("#an").disabled=false}};
+  $("#sv2").onclick=async()=>{const r=await api("POST",`/api/fittings/${f.fitting_id}/inspection`,{result:ai.res,confidence:ai.conf});r.success?(toast("Inspection saved"),go("fitting",f.fitting_id)):toast(r.message)}}
 
 /* ---------- boot ---------- */
 (async()=>{const r=await api("GET","/api/me");if(r.success){me=r.user;start()}else showLogin()})();
