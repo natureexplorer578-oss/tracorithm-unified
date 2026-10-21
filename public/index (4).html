@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TRACORITHM</title>
+<style>
+:root{--navy:#18212f;--navy2:#263246;--bg:#f2f4f7;--card:#fff;--line:#e2e6ec;--text:#1c2430;--mute:#6b7585;--blue:#2563eb;--green:#16a34a;--amber:#d97706;--red:#dc2626}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 "Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}h1,h2,h3{margin:0}
+.hide{display:none!important}
+#login{min-height:100vh;display:grid;place-items:center;padding:16px}
+.lcard{background:var(--card);width:100%;max-width:400px;padding:32px;border-radius:12px;box-shadow:0 4px 24px rgba(20,30,50,.08)}
+.brand{font-weight:800;letter-spacing:.5px;color:var(--navy);font-size:26px;text-align:center}.sub{color:var(--mute);text-align:center;margin:4px 0 22px;font-size:13px}
+label{display:block;font-size:13px;font-weight:600;margin:12px 0 4px}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:#fff}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+.pw{position:relative}.pw button{position:absolute;right:6px;top:5px;border:0;background:none;color:var(--mute);cursor:pointer;padding:4px 8px}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:600;cursor:pointer}.btn:disabled{opacity:.6;cursor:wait}
+.btn.alt{background:#e8ecf2;color:var(--text)}.btn.red{background:var(--red)}.btn.dark{background:var(--navy)}.full{width:100%;margin-top:18px}
+.err{color:var(--red);font-size:13px;margin-top:10px;min-height:18px}.ok{color:var(--green)}
+#app{display:flex;min-height:100vh}
+aside{width:236px;background:var(--navy);color:#cdd6e4;padding:18px 12px;flex-shrink:0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+aside .logo{color:#fff;font-weight:800;font-size:20px;padding:4px 10px 16px}
+aside a{display:block;padding:10px 12px;border-radius:8px;color:inherit;text-decoration:none;cursor:pointer;margin-bottom:2px}
+aside a:hover{background:var(--navy2)}aside a.on{background:var(--navy2);color:#fff;box-shadow:inset 3px 0 var(--blue)}
+aside .out{margin-top:auto}
+main{flex:1;min-width:0}
+header{display:flex;align-items:center;gap:12px;padding:14px 28px;border-bottom:1px solid var(--line)}
+header h2{font-size:17px;flex:1}.who{color:var(--mute);font-size:13px}
+#menu{display:none;background:none;border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer}
+#view{padding:24px 28px}
+.card{background:var(--card);border-radius:10px;padding:18px;margin-bottom:16px;box-shadow:0 1px 3px rgba(20,30,50,.06)}
+.card h3{font-size:16px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.stat{background:var(--card);border-radius:10px;padding:14px 16px;box-shadow:0 1px 3px rgba(20,30,50,.06)}.stat b{display:block;font-size:26px}.stat span{color:var(--mute);font-size:13px}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0 14px}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}.kv div{background:#f6f8fa;border-radius:8px;padding:8px 12px}.kv small{display:block;color:var(--mute);font-size:12px}
+.tbl{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}th{color:var(--mute);font-weight:600}
+tr.row{cursor:pointer}tr.row:hover{background:#f6f8fa}
+.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;background:#e8ecf2}
+.b-g{background:#dcfce7;color:#166534}.b-a{background:#fef3c7;color:#92400e}.b-r{background:#fee2e2;color:#991b1b}.b-b{background:#dbeafe;color:#1e40af}
+.row2{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.empty{color:var(--mute);padding:14px 0}
+.bar{height:10px;background:#e8ecf2;border-radius:6px;overflow:hidden;margin:3px 0 10px}.bar i{display:block;height:100%;background:var(--blue)}
+.tl{border-left:2px solid var(--line);margin-left:6px;padding-left:14px}.tl div{margin-bottom:12px;position:relative}.tl div:before{content:"";position:absolute;left:-20px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--blue)}
+video,canvas,.prev{max-width:100%;border-radius:8px;background:#111}
+#toast{position:fixed;bottom:18px;right:18px;background:var(--navy);color:#fff;padding:10px 16px;border-radius:8px;z-index:9}
+.big{font-size:26px;font-weight:800;margin:0}.big2{font-size:22px;margin:0 0 4px}.c{text-align:center}.grow{flex:1;text-align:center}
+.kv div{font-weight:700}.kv small{font-weight:400}
+.card.alert{background:#fff1f1;border-left:4px solid var(--red)}.card.pred{border-left:4px solid var(--blue)}
+.tile{background:#f6f8fa;border-radius:8px;padding:8px 12px;margin:10px 0;font-weight:700}.tile small{display:block;font-weight:400;color:var(--mute);font-size:12px}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:8px;background:var(--red)}.dot.g{background:var(--green)}
+.card h2{font-size:21px;margin:4px 0 6px}.txt-r{color:var(--red)}
+.aigrid{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-top:12px}
+.camwrap{position:relative;background:#111;border-radius:10px;overflow:hidden;margin-top:10px;min-height:120px}.camwrap video,.camwrap canvas{display:block;width:100%;height:auto;border-radius:0}
+.live{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.7);color:#fff;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:600}
+.msgbox{background:#f2f4f7;border-radius:8px;padding:10px 12px;margin-top:10px;color:var(--mute);font-size:14px}
+.crow{display:flex;justify-content:space-between;font-weight:600;font-size:13px}.rico{font-size:46px;line-height:1.1}
+.bar i.good{background:var(--green)}.bar i.bad{background:var(--red)}
+body{font-family:Arial,Helvetica,sans-serif}
+.card{border-radius:10px;padding:25px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.kv{grid-template-columns:1fr 1fr;gap:15px}.kv div{background:#f9fafb;padding:15px;border-radius:7px;font-size:16px}.kv small{font-size:13px;color:#666;margin-bottom:5px}
+.card.alert{border-left:6px solid var(--red);background:#fff7f7}.card.okc{border-left:6px solid var(--green)}.card.pred{border-left:6px solid #2563eb}
+.card h2{font-size:24px;margin:0 0 10px}.tile{background:#f9fafb;padding:14px;border-radius:7px;font-size:18px}.tile small{font-size:13px;color:#666;margin-bottom:5px}
+.big{font-size:25px}.row2>.badge{padding:10px 16px;font-size:15px;border-radius:20px;background:#e5e7eb}
+.card.alert .btn{padding:13px 22px;border-radius:6px;font-size:16px}
+.aicard{border-radius:16px;padding:20px;border:1px solid #e2e8f0;box-shadow:0 6px 20px rgba(15,23,42,.08)}
+.aicard h3{font-size:19px;margin-bottom:16px}.aicard label{font-size:13px;color:#475569}.aicard select{padding:12px;border-radius:9px;border-color:#cbd5e1}
+.aigrid{grid-template-columns:1.25fr 1fr;gap:20px}.camwrap{background:#020617;border-radius:12px}
+.aicard .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.aicard .btn{padding:14px;border-radius:9px;font-size:15px}
+.aicard .btn.alt{background:#e2e8f0;color:#111827;text-align:center}.aicard #an{background:#111827}.aicard .btn:disabled{opacity:.5;cursor:not-allowed}
+.aicard .msgbox{background:#f1f5f9;color:#475569;border-radius:9px;line-height:1.5}
+#rt{font-size:32px!important;font-weight:800}.rico{font-size:55px}#rc{color:#64748b;font-size:17px;margin-bottom:15px}
+.aicard .bar{height:9px;border-radius:10px;background:#e2e8f0}.aicard .bar.cf{height:14px;border-radius:20px}
+.aicard .bar i{background:#64748b;transition:width .5s ease}.aicard .bar i.good{background:#16a34a}.aicard .bar i.bad{background:#dc2626}
+.crow{font-size:13px}
+.banner{background:#1f2937;color:#fff;text-align:center;padding:20px;border-radius:10px;margin-bottom:20px}.banner b{display:block;font-size:28px}.banner span{display:block;margin-top:8px}
+#fv{margin:20px 0 0}
+.form2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.w950{max-width:950px;margin:0 auto}
+.aihead{background:#111827;color:#fff;padding:18px 28px;border-radius:12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;box-shadow:0 4px 15px rgba(0,0,0,.15)}
+.aihead b{display:block;font-size:26px;font-weight:800;letter-spacing:1px}.aihead div span{display:block;font-size:13px;color:#cbd5e1;margin-top:4px}.aihead>span{font-size:13px;display:flex;align-items:center;gap:8px}
+.aih1{font-size:30px;margin:0}.aisub{color:#64748b;margin:7px 0 0}.ptitle{margin-top:20px;font-size:14px;font-weight:700;color:#475569}
+@media(max-width:800px){aside{position:fixed;left:-250px;z-index:5;transition:left .2s}aside.open{left:0}#menu{display:block}#view{padding:16px}header{padding:12px 16px}.aigrid{grid-template-columns:1fr}.kv,.form2{grid-template-columns:1fr}}
+</style></head><body>
+<div id="login" class="hide"><form class="lcard" id="lf" autocomplete="on">
+<div class="brand">TRACORITHM</div><div class="sub">Railway Asset Tracking &amp; AI Visual Inspection System</div>
+<label for="u">Username</label><input id="u" autocomplete="username" required>
+<label for="p">Password</label><div class="pw"><input id="p" type="password" autocomplete="current-password" required><button type="button" id="eye" aria-label="Show password">Show</button></div>
+<button class="btn full" id="lb">Sign in</button><div class="err" id="le" role="alert"></div></form></div>
+<div id="app" class="hide"><aside id="side"><div class="logo">TRACORITHM</div><nav id="nav"></nav><a class="out" id="logout">Log out</a></aside>
+<main><header><button id="menu" aria-label="Menu">Menu</button><h2 id="title"></h2><span class="who" id="who"></span></header><div id="view"></div></main></div>
+<div id="toast" class="hide"></div>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+const $=s=>document.querySelector(s), COMP=["Fish Plate","Rail Clip","Pandrol Clip"];
+const CLASSES=["Fish Plate - Good","Fish Plate - Damaged","Rail Clip - Good","Rail Clip - Damaged"];
+let LABELS=CLASSES.slice();const MIN_CONF=70;
+async function loadAI(){if(!model){model=await tf.loadLayersModel("/model/model.json");try{const m=await(await fetch("/model/metadata.json")).json();if(Array.isArray(m.labels)&&m.labels.length)LABELS=m.labels}catch{}}return model}
+let me=null, stream=null, model=null, pending=null, ai={};
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fd=v=>v?String(v).slice(0,10).split("-").reverse().join("/"):"-";
+async function api(m,u,b){const r=await fetch(u,{method:m,headers:{"Content-Type":"application/json"},body:b?JSON.stringify(b):undefined});
+  const j=await r.json().catch(()=>({success:false,message:"Unexpected server response."}));if(r.status===401&&me){me=null;showLogin("Your session expired. Please sign in again.")}return j}
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.remove("hide");setTimeout(()=>e.classList.add("hide"),3200)}
+const badge=s=>{const c={Installed:"b-g",Damaged:"b-r","In Stock":"b-b",Manufactured:"",GOOD:"b-g",DAMAGED:"b-r",Overdue:"b-r","Due today":"b-a","On schedule":"b-g","Within expected life":"b-g","Expected life reached":"b-a"}[s]||"";return `<span class="badge ${c}">${esc(s)}</span>`};
+
+/* ---------- login ---------- */
+function showLogin(msg){stopCam();$("#app").classList.add("hide");$("#login").classList.remove("hide");$("#le").textContent=msg||""}
+$("#eye").onclick=()=>{const p=$("#p"),s=p.type==="password";p.type=s?"text":"password";$("#eye").textContent=s?"Hide":"Show"};
+$("#lf").onsubmit=async e=>{e.preventDefault();$("#lb").disabled=true;$("#lb").textContent="Signing in...";$("#le").textContent="";
+  const r=await api("POST","/api/login",{username:$("#u").value,password:$("#p").value});$("#lb").disabled=false;$("#lb").textContent="Sign in";
+  if(!r.success)return $("#le").textContent=r.message||"Sign in failed.";$("#p").value="";me=r.user;start()};
+$("#logout").onclick=async()=>{await api("POST","/api/logout");me=null;history.pushState({},"","/");showLogin()};
+
+/* ---------- shell ---------- */
+const NAV={admin:["dash","manufacturer","install","inspector","items","inventory","analytics","users"],inspector:["dash","install","inspector","items","inventory","analytics"],manufacturer:["dash","manufacturer","items","inventory","analytics"]};
+const LBL={dash:"Main Dashboard",inspector:"Inspector Dashboard",manufacturer:"Manufacturer Dashboard",items:"Manufactured Items",inventory:"Inventory",analytics:"Analytics",users:"Users",fitting:"Fitting",install:"Installation Dashboard"};
+const can=(...r)=>me.role==="admin"||r.includes(me.role);
+function start(){$("#login").classList.add("hide");$("#app").classList.remove("hide");$("#who").textContent=`${me.name||me.username} (${me.role})`;
+  $("#nav").innerHTML=NAV[me.role].map(k=>`<a data-k="${k}">${LBL[k]}</a>`).join("");
+  document.querySelectorAll("#nav a").forEach(a=>a.onclick=()=>go(a.dataset.k));
+  const m=location.pathname.match(/^\/f\/([\w-]+)/);if(m)go("fitting",m[1].toUpperCase());else go(me.role==="manufacturer"?"manufacturer":me.role==="inspector"?"inspector":"dash")}
+$("#menu").onclick=()=>$("#side").classList.toggle("open");
+async function go(k,arg){if(k==="fitting"&&can("inspector")){const r=await api("GET","/api/fittings/"+encodeURIComponent(arg));k=r.success&&!r.installation?"install":"inspector"}stopCam();$("#side").classList.remove("open");ai={};
+  document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("on",a.dataset.k===k));
+  $("#title").textContent=k==="fitting"?"Fitting "+arg:LBL[k];history.pushState({},"",arg?"/f/"+arg:"/");
+  $("#view").innerHTML='<div class="empty">Loading...</div>';await V[k](arg)}
+window.onpopstate=()=>me&&start();
+
+/* ---------- views ---------- */
+const V={};
+const table=(rows,cols,op)=>rows.length?`<div class="tbl"><table><tr>${cols.map(c=>`<th>${c[0]}</th>`).join("")}</tr>${rows.map(r=>`<tr class="row" onclick="${op||"go('fitting',"}'${esc(r.fitting_id)}')">${cols.map(c=>`<td>${c[1](r)}</td>`).join("")}</tr>`).join("")}</table></div>`:'<div class="empty">No records yet.</div>';
+const COLS=[["Fitting ID",r=>`<b>${esc(r.fitting_id)}</b>`],["Component",r=>esc(r.component)],["Manufacturer",r=>esc(r.manufacturer||"-")],["Batch",r=>esc(r.batch||"-")],["Status",r=>badge(r.status)],["Next inspection",r=>r.next_inspection?fd(r.next_inspection)+(r.overdue_days?` ${badge("Overdue")}`:""):"-"]];
+
+V.dash=async()=>{const [f,a]=await Promise.all([api("GET","/api/fittings"),api("GET","/api/analytics")]);const L=f.fittings||[];
+  const n=s=>L.filter(x=>x.status===s).length, over=L.filter(x=>x.overdue_days>0).length, i=a.inspections||{total:0,good:0,damaged:0};
+  $("#view").innerHTML=`<div class="grid"><div class="stat"><b>${L.length}</b><span>Registered fittings</span></div><div class="stat"><b>${n("Installed")}</b><span>Installed</span></div><div class="stat"><b>${n("Manufactured")+n("In Stock")}</b><span>Awaiting installation</span></div><div class="stat"><b>${over}</b><span>Overdue inspections</span></div><div class="stat"><b>${i.damaged}</b><span>AI-classified damaged (of ${i.total} inspections)</span></div></div>
+  <div class="card"><h3>Quick actions</h3><div class="row2">${can("manufacturer")?'<button class="btn" onclick="go(\'manufacturer\')">Register a fitting</button>':""}${can("inspector")?'<button class="btn" onclick="go(\'install\')">Record installation</button><button class="btn dark" onclick="go(\'inspector\')">Start AI inspection</button>':""}<button class="btn alt" onclick="go('inventory')">Open inventory</button></div></div>
+  <div class="card"><h3>Overdue inspections</h3>${table(L.filter(x=>x.overdue_days>0),COLS)}</div>`};
+
+V.items=async()=>{const r=await api("GET","/api/fittings");window._L=r.fittings||[];
+  $("#view").innerHTML=`<div class="card"><div class="row2" style="margin-bottom:12px"><input id="qs" placeholder="Search ID, manufacturer, batch" style="max-width:280px"><select id="qc" style="max-width:170px"><option value="">All components</option>${COMP.map(c=>`<option>${c}</option>`).join("")}</select></div><div id="tb"></div></div>`;
+  const draw=()=>{const s=$("#qs").value.toLowerCase(),c=$("#qc").value;$("#tb").innerHTML=table(window._L.filter(x=>(!c||x.component===c)&&[x.fitting_id,x.manufacturer,x.batch].join(" ").toLowerCase().includes(s)),COLS)};$("#qs").oninput=draw;$("#qc").onchange=draw;draw()};
+
+V.inventory=async()=>{const r=await api("GET","/api/fittings"),L=r.fittings||[],S=["Manufactured","In Stock","Installed","Damaged"];
+  $("#view").innerHTML=`<div class="grid">${S.map(s=>`<div class="stat"><b>${L.filter(x=>x.status===s).length}</b><span>${s}</span></div>`).join("")}</div><div class="card"><h3>All fittings by status</h3>${table(L,[...COLS.slice(0,2),COLS[4],["Warranty",r=>r.warranty_months!=null?r.warranty_months+" months":"-"],["Supplied",r=>fd(r.supply_date)],["Last AI result",r=>r.last_result?badge(r.last_result):"-"]])}</div>`};
+
+function mshow(id){V.fitting(id,"mfg");const e=$("#fv");if(e)e.scrollIntoView({behavior:"smooth"})}
+V.manufacturer=async()=>{
+  if(!can("manufacturer")){$("#view").innerHTML='<div class="card">Manufacturer tools are for manufacturer accounts.</div>';return}
+  $("#view").innerHTML=`<div class="banner"><b>TRACORITHM</b><span>Railway Asset Manufacturing</span></div>
+  <div class="card"><h3 class="big2">Register New Fitting</h3><p class="who" style="margin-top:0">Enter the manufacturing details to register a fitting and create its QR code.</p><form id="rf" class="form2">
+  <div><label>Fitting ID</label><input name="fitting_id" placeholder="TRC-FP-004" required></div>
+  <div><label>Component</label><select name="component">${COMP.map(c=>`<option>${c}</option>`).join("")}</select></div>
+  <div><label>Manufacturer</label><input name="manufacturer" value="${esc(me.name||"")}"></div><div><label>Batch / Lot</label><input name="batch"></div>
+  <div><label>Manufacturing Date</label><input type="date" name="mfg_date"></div><div><label>Supply Date</label><input type="date" name="supply_date"></div>
+  <div><label>Warranty (Months)</label><input type="number" min="0" name="warranty_months"></div></form><div class="err" id="re"></div>
+  <div class="row2" style="margin-top:14px"><button class="btn" id="rb" style="padding:13px 22px;border-radius:6px;font-size:16px">Register Fitting</button><button class="btn" id="rc" style="background:#4b5563;color:#fff;padding:13px 22px;border-radius:6px;font-size:16px">Clear Form</button></div></div>
+  <div id="qrbox"></div><div id="fv" data-nb="1"></div>
+  <div class="card"><h3 class="big2">Manufactured Fittings</h3><div id="mine" style="margin-top:10px"></div></div>`;
+  const load=async()=>$("#mine").innerHTML=table((await api("GET","/api/fittings")).fittings||[],COLS.slice(0,5),"mshow(");load();
+  $("#rc").onclick=()=>{$("#rf").reset();$("#re").textContent=""};
+  $("#rb").onclick=async()=>{const f=$("#rf");if(!f.reportValidity())return;const r=await api("POST","/api/fittings",Object.fromEntries(new FormData(f)));
+    $("#re").textContent=r.success?"":r.message;if(!r.success)return;toast("Fitting registered");f.reset();load();qrCard(r.fitting_id,"#qrbox");await V.fitting(r.fitting_id,"mfg");$("#qrbox").scrollIntoView({behavior:"smooth"})}};
+
+function qrCard(id,sel){const url=location.origin+"/f/"+id;$(sel).innerHTML=`<div class="card"><h3>QR code for ${esc(id)}</h3><div id="qr" style="display:inline-block;background:#fff;padding:10px"></div><div class="who" style="margin:8px 0">${esc(url)}</div><button class="btn alt" id="dl">Download QR</button></div>`;
+  new QRCode($("#qr"),{text:url,width:200,height:200,correctLevel:QRCode.CorrectLevel.M});
+  $("#dl").onclick=()=>{const c=$("#qr canvas"),a=document.createElement("a");a.href=c.toDataURL("image/png");a.download=id+".png";a.click()}}
+
+function ishow(id){V.fitting(id,"install");const e=$("#fv");if(e)e.scrollIntoView({behavior:"smooth"})}
+V.install=async arg=>{
+  $("#view").innerHTML=`<div class="banner"><b>TRACORITHM</b><span>Railway Asset Installation</span></div>
+  <div class="card"><h3 class="big2">Installation Dashboard</h3><p class="who" style="margin-top:0">Select a fitting to record its installation, or to view and reset its installation details.</p>
+  <input id="is" placeholder="Search fitting ID or component" style="max-width:320px;margin-bottom:12px"><div id="il"></div></div><div id="fv" data-nb="1"></div>`;
+  const L=(await api("GET","/api/fittings")).fittings||[];
+  const draw=()=>{const s=$("#is").value.toLowerCase();$("#il").innerHTML=table(L.filter(x=>[x.fitting_id,x.component].join(" ").toLowerCase().includes(s)),[COLS[0],COLS[1],COLS[4],["Installation",r=>r.install_date?fd(r.install_date):"Not installed"]],"ishow(")};
+  $("#is").oninput=draw;draw();
+  if(arg){$("#fv").innerHTML='<div class="empty">Loading...</div>';V.fitting(arg,"install")}};
+V.inspector=async arg=>{$("#view").innerHTML=`<div id="aip"></div><div id="fv"></div>`;
+  if(arg){$("#fv").innerHTML='<div class="empty">Loading...</div>';V.fitting(arg,"inspect")}else aiBlock(null,"#aip")};
+function stopCam(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}}
+
+V.users=async()=>{const r=await api("GET","/api/users");$("#view").innerHTML=`<div class="card"><h3>Add user</h3><form id="uf" class="form"><div><label>Username</label><input name="username" required></div><div><label>Name</label><input name="name"></div><div><label>Password (min 8)</label><input name="password" type="password" required></div><div><label>Role</label><select name="role"><option>inspector</option><option>manufacturer</option><option>admin</option></select></div></form><div class="err" id="ue"></div><button class="btn" id="ub">Create user</button></div>
+  <div class="card"><h3>Users</h3><div class="tbl"><table><tr><th>Username</th><th>Name</th><th>Role</th></tr>${(r.users||[]).map(u=>`<tr><td>${esc(u.username)}</td><td>${esc(u.name)}</td><td>${esc(u.role)}</td></tr>`).join("")}</table></div></div>`;
+  $("#ub").onclick=async()=>{const f=$("#uf");if(!f.reportValidity())return;const x=await api("POST","/api/users",Object.fromEntries(new FormData(f)));if(!x.success)return $("#ue").textContent=x.message;toast("User created");V.users()}};
+
+V.analytics=async()=>{const a=await api("GET","/api/analytics"),i=a.inspections||{total:0,good:0,damaged:0},mx=Math.max(1,...(a.monthly||[]).map(m=>m.n));
+  const pass=i.total?(i.good/i.total*100).toFixed(1)+"%":"-";
+  $("#view").innerHTML=`<div class="grid"><div class="stat"><b>${i.total}</b><span>AI inspections recorded</span></div><div class="stat"><b>${i.good}</b><span>Classified good</span></div><div class="stat"><b>${i.damaged}</b><span>Classified damaged</span></div><div class="stat"><b>${pass}</b><span>Pass rate (good / all inspections, all time)</span></div></div>
+  <div class="card"><h3>Fittings by status</h3>${(a.status||[]).map(s=>`<div>${esc(s.status)}: ${s.n}</div>`).join("")||'<div class="empty">No fittings yet.</div>'}</div>
+  <div class="card"><h3>Inspections per month</h3>${(a.monthly||[]).map(m=>`<div>${m.m}: ${m.n}</div><div class="bar"><i style="width:${m.n/mx*100}%"></i></div>`).join("")||'<div class="empty">No inspections recorded yet.</div>'}</div>
+  <div class="card"><h3>Damaged results by batch</h3>${(a.batches||[]).map(b=>`<div>${esc(b.batch)}: ${b.damaged} damaged of ${b.inspected} inspections</div>`).join("")||'<div class="empty">No inspections recorded yet.</div>'}</div>`};
+
+V.fitting=async(id,mode)=>{mode=mode||(can("inspector")?"inspect":"mfg");
+  const root=$("#fv")||$("#view"),r=await api("GET","/api/fittings/"+encodeURIComponent(id));
+  if(!r.success){root.innerHTML=`<div class="card"><b>${esc(r.message)}</b><p class="who">Check the ID or ask the manufacturer to register this fitting.</p></div>`;return}
+  const f=r.fitting,I=r.installation,S=r.schedule,P=r.prediction,reload=()=>V.fitting(f.fitting_id,mode),od=S&&S.overdue_days>0,
+    aiOK=mode==="inspect"&&can("inspector")&&f.component!=="Pandrol Clip",
+    smsg=!S?"":od?`The scheduled inspection is overdue by ${S.overdue_days} day(s). Immediate inspection is needed.`:S.status==="Due today"?"An inspection is due today.":"The next inspection is scheduled. No action is needed yet.";
+  const banner=root.dataset.nb?"":'<div class="banner"><b>TRACORITHM</b><span>Railway Asset Tracking System</span></div>';
+  const head=`<div class="card"><div class="row2"><div style="flex:1"><h1 class="big">${esc(f.fitting_id)}</h1><span class="who">${esc(f.component)}</span></div>${badge(f.status)}</div></div>`;
+  const stat=S?`<div class="card ${od?"alert":"okc"}"><h3>Inspection Status</h3><h2 class="${od?"txt-r":""}"><i class="dot ${od?"":"g"}"></i>${od?"INSPECTION REQUIRED":S.status==="Due today"?"INSPECTION DUE TODAY":"INSPECTION ON SCHEDULE"}</h2><p style="margin:0">${smsg}</p><div class="tile"><small>Scheduled Inspection Date</small>${fd(S.next_inspection)}</div>${aiOK?'<button class="btn red" id="goai">SCAN &amp; AI ANALYSE</button>':""}</div>
+  <div class="card pred"><h3>TRACORITHM Prediction</h3><h2>${P.remaining_days<=0?"REPLACEMENT RECOMMENDED":"WITHIN EXPECTED LIFE"}</h2><p style="margin:0 0 10px">${P.remaining_days<=0?"The entered expected service life has been reached or exceeded.":"The component is within its entered expected service life."} This is a time-based estimate and does not show physical damage.</p><div class="kv"><div><small>Component Age</small>${P.age_days} days</div><div><small>Remaining Expected Life</small>${P.remaining_days} days</div></div></div>`:"";
+  const ctrl=I&&mode==="install"?'<div class="card"><h3>Installation Control</h3><p class="who" style="margin-top:0">Resetting clears only the installation details and returns this fitting to stock. The manufacturing record, inspections and history are kept.</p><button class="btn red" id="rs">Reset Installation</button></div>':"";
+  const mfg=`<div class="card"><h3>Manufacturing</h3><div class="kv"><div><small>Manufacturer</small>${esc(f.manufacturer||"-")}</div><div><small>Batch / lot</small>${esc(f.batch||"-")}</div><div><small>Manufactured</small>${fd(f.mfg_date)}</div><div><small>Supplied</small>${fd(f.supply_date)}</div><div><small>Warranty</small>${f.warranty_months!=null?f.warranty_months+" months":"-"}</div></div><div id="qrbox" style="margin-top:12px"></div><button class="btn alt" id="showqr" style="margin-top:10px">Show QR code</button></div>`;
+  const hist=`<div class="card"><h3>Lifecycle history</h3>${r.events.length?`<div class="tl">${r.events.map(e=>`<div><b>${esc(e.type)}</b> <span class="who">${new Date(e.at).toLocaleString()} by ${esc(e.by_user||"-")}</span><br>${esc(e.detail||"")}</div>`).join("")}</div>`:'<div class="empty">No events yet.</div>'}</div>`;
+  root.innerHTML=banner+head+(mode==="mfg"?mfg:'<div id="inst"></div>'+stat)+ctrl+(aiOK?'<div id="aic"></div>':"")+hist;
+  if($("#showqr"))$("#showqr").onclick=()=>{qrCard(f.fitting_id,"#qrbox");$("#showqr").remove()};
+  if($("#rs"))$("#rs").onclick=async()=>{if(!confirm("Reset the installation details for "+f.fitting_id+"? Inspections and history are kept."))return;const x=await api("POST",`/api/fittings/${f.fitting_id}/reset`);x.success?reload():toast(x.message)};
+  if(mode!=="mfg")instBlock(f,I,mode==="install"&&can("inspector"),reload);
+  if(aiOK)aiBlock(f,"#aic",reload);
+  if($("#goai"))$("#goai").onclick=()=>$("#aic").scrollIntoView({behavior:"smooth"})};
+
+function instBlock(f,I,inspector,reload){const box=$("#inst"),T=(l,v)=>`<div><small>${l}</small>${esc(v)}</div>`;
+  if(I){box.innerHTML=`<div class="card"><h3 class="big2">Installation Information</h3><div class="kv" style="margin-top:10px">${T("Railway Zone",I.zone)}${T("Division",I.division)}${T("Station",I.station)}${T("Track Number",I.track)}${T("KM Location",I.km)}${T("Installed By",I.installed_by)}${T("Installation Date",fd(I.install_date))}${T("Number of Pieces",I.pieces)}${T("Expected Life",I.expected_life+" days")}${T("Inspection Interval",I.inspect_interval+" days")}${T("Initial Condition",I.condition)}${T("Condition Notes",I.notes||"No notes")}</div></div>`;return}
+  if(!inspector){box.innerHTML='<div class="card"><h3>Installation Information</h3><div class="empty">This fitting is not installed yet. Record its installation in the Installation Dashboard.</div></div>';return}
+  const F=(n,l,x="")=>`<div><label>${l}</label><input name="${n}" required ${x}></div>`;
+  box.innerHTML=`<div class="card"><h3 class="big2">Installation Details</h3><p class="who" style="margin-top:0">Enter the installation details manually before saving.</p><form id="if" class="form2">${F("zone","Railway Zone",'type="text"')}${F("division","Division",'type="text"')}${F("station","Station",'type="text"')}${F("track","Track Number",'type="text"')}${F("km","KM Location",'type="text"')}${F("installed_by","Installed By",'type="text"')}${F("install_date","Installation Date",'type="date"')}${F("pieces","Number of Pieces",'type="number" min="1"')}${F("expected_life","Expected Life (Days)",'type="number" min="1"')}${F("inspect_interval","Inspection Interval (Days)",'type="number" min="1"')}
+    <div style="grid-column:1/-1"><label>Initial Condition</label><select name="condition" required><option value="">Select condition</option><option>Good</option><option>Needs Inspection</option><option>Needs Replacement</option></select></div>
+    <div style="grid-column:1/-1"><label>Condition Notes</label><textarea name="notes" rows="3" placeholder="Enter observations..."></textarea></div></form><div class="err" id="ie"></div>
+    <div class="row2" style="margin-top:14px"><button class="btn" id="ib" style="padding:13px 22px;border-radius:6px;font-size:16px">Save Installation</button><button class="btn" id="ic" style="background:#6b7280;padding:13px 22px;border-radius:6px;font-size:16px">Clear Form</button></div></div>`;
+  $("#ic").onclick=()=>{$("#if").reset();$("#ie").textContent=""};
+  $("#ib").onclick=async()=>{const f2=$("#if");if(!f2.reportValidity())return;const r=await api("POST",`/api/fittings/${f.fitting_id}/install`,Object.fromEntries(new FormData(f2)));r.success?(toast("Installation saved"),reload()):$("#ie").textContent=r.message}}
+
+/* ---------- AI inspection (runs in the browser with your Teachable Machine model) ---------- */
+function aiBlock(f,sel,reload){const box=$(sel||"#aic");
+  if(f&&f.component==="Pandrol Clip"){box.innerHTML='<div class="card"><h3>AI Visual Inspection</h3><div class="empty">The trained model has no Pandrol Clip class yet, so AI inspection is not available for this component. Retrain the model with Pandrol photos to enable it.</div></div>';return}
+  box.innerHTML=`${f?'<div class="row2" style="display:flex;justify-content:space-between"><h3 class="big2">AI Visual Inspection</h3><span class="who"><i class="dot" id="aid" style="background:#f59e0b"></i><span id="aist">Loading AI model...</span></span></div><p class="who" style="margin:0">Capture or upload a railway component image and let the trained AI model classify its condition.</p>':'<div class="aihead"><div><b>TRACORITHM</b><span>Railway Asset AI Visual Inspection System</span></div><span><i class="dot" id="aid" style="background:#f59e0b"></i><span id="aist">Loading AI model...</span></span></div><h1 class="aih1">AI Visual Inspection</h1><p class="aisub">Capture or upload a railway component image and let the trained AI model classify its condition.</p>'}
+  <div class="aigrid"><div class="card aicard"><h3>Inspection Camera</h3><label style="margin-top:0">Select Railway Component</label>${f?`<select disabled><option>${esc(f.component)}</option></select>`:`<select id="cs"><option>Fish Plate</option><option>Rail Clip</option></select>`}
+    <div class="camwrap"><video id="av" playsinline muted></video><canvas id="ac" width="224" height="224" class="hide"></canvas><span class="live" id="lv">&#9679; LIVE CAMERA</span></div>
+    <div class="row2" style="margin-top:10px"><button class="btn alt grow" id="cap">&#128247; Capture Image</button><label class="btn alt grow" style="margin:0;cursor:pointer">&#128193; Upload Image<input id="up" type="file" accept="image/*" class="hide"></label></div>
+    <p class="who c" style="margin:6px 0">Upload JPG, JPEG, PNG or other image files</p><button class="btn alt hide full" id="sw" style="margin:0 0 6px">Switch camera</button><button class="btn dark full" id="an" style="margin-top:6px">&#129302; Analyze with AI</button>
+    <div class="ptitle">Captured / Uploaded Image</div><div class="msgbox" id="am" style="margin-top:8px">Starting camera...</div></div>
+  <div class="card aicard c"><h3>Inspection Result</h3><div class="rico" id="ri">&#128269;</div><h2 id="rt" style="font-size:30px">Waiting</h2><div class="who" id="rc">Confidence: --</div><div class="bar cf" style="margin-top:8px"><i id="rb" style="width:0"></i></div>
+    <h3 style="margin-top:16px">AI Classification</h3><div style="text-align:left">${CLASSES.map((c,i)=>`<div class="crow"><span>${c.replace(" - "," \u2014 ")}</span><span id="p${i}">0%</span></div><div class="bar"><i id="b${i}" style="width:0"></i></div>`).join("")}</div>
+    <button class="btn hide full" id="sv2">Save result to this fitting</button></div></div>`;
+  const cv=$("#ac"),vd=$("#av"),msg=t=>$("#am").textContent=t;let got=false,live=false;const CAPL="&#128247; Capture Image",RETL="&#128247; Retake";const put=(s,w,h)=>{const k=Math.min(1,1280/Math.max(w,h));cv.width=Math.round(w*k);cv.height=Math.round(h*k);cv.getContext("2d").drawImage(s,0,0,cv.width,cv.height)};
+  const show=(img)=>{vd.classList.toggle("hide",img);cv.classList.toggle("hide",!img);$("#lv").classList.toggle("hide",img||!live)};
+  const reset=()=>{["rt","rc","rb"].forEach(k=>0);$("#rt").textContent="Waiting";$("#rt").style.color="";$("#ri").innerHTML="&#128269;";$("#rc").textContent="Confidence: --";$("#rb").style.width="0";$("#rb").className="";$("#sv2").classList.add("hide");CLASSES.forEach((c,i)=>{$("#p"+i).textContent="0%";$("#b"+i).style.width="0"})};
+  let devs=[],ci=0;
+  const cam=async id=>{try{stopCam();stream=await navigator.mediaDevices.getUserMedia({video:id?{deviceId:{exact:id}}:{facingMode:{ideal:"environment"}}});vd.srcObject=stream;await vd.play();live=true;show(false);
+    try{devs=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==="videoinput")}catch{}$("#sw").classList.toggle("hide",devs.length<2);
+    msg("Camera ready. Point it at the railway component (not at yourself) and click Capture Image.")}catch{live=false;$("#lv").classList.add("hide");msg("Camera not available. Use Upload Image instead (the camera needs https).")}};
+  $("#sw").onclick=()=>{ci=(ci+1)%devs.length;cam(devs[ci].deviceId)};
+  cam();
+  (async()=>{try{await loadAI();$("#aist").textContent="AI Model Ready";$("#aid").style.background="#22c55e"}catch(e){console.error(e);$("#aist").textContent="AI Model Error";$("#aid").style.background="#dc2626"}})();
+  $("#cap").onclick=async()=>{if(got){got=false;$("#cap").innerHTML=CAPL;reset();if(!stream)await cam();else{show(false);msg("Camera ready. Position the component and click Capture Image.")}return}
+    if(!stream||!vd.videoWidth)return msg("The camera is not ready. Use Upload Image instead.");put(vd,vd.videoWidth,vd.videoHeight);got=true;show(true);$("#cap").innerHTML=RETL;reset();msg("Image captured. Click Analyze with AI.")};
+  $("#up").onchange=e=>{const file=e.target.files[0];e.target.value="";if(!file)return;const im=new Image();im.onerror=()=>msg("That file could not be read as an image.");
+    im.onload=()=>{put(im,im.naturalWidth,im.naturalHeight);got=true;show(true);$("#cap").innerHTML=RETL;reset();msg("Image uploaded. Click Analyze with AI.")};im.src=URL.createObjectURL(file)};
+  $("#an").onclick=async()=>{if(!got)return msg("Capture or upload an image first.");$("#an").disabled=true;msg("Loading model and analyzing...");
+    try{await loadAI();
+      const p=tf.tidy(()=>model.predict(tf.browser.fromPixels(cv).resizeBilinear([224,224]).toFloat().div(127.5).sub(1).expandDims(0)));const pr=Array.from(await p.data());p.dispose();
+      pr.forEach((v,i)=>{const j=CLASSES.indexOf(LABELS[i]);if(j>=0){$("#p"+j).textContent=(v*100).toFixed(1)+"%";$("#b"+j).style.width=(v*100)+"%"}});
+      const k=pr.indexOf(Math.max(...pr)),label=LABELS[k]||"",conf=pr[k]*100,mt=/^(.+) - (Good|Damaged)$/.exec(label);
+      if(!mt){$("#rt").textContent="No component";$("#ri").innerHTML="&#128683;";$("#rc").textContent="Confidence: "+conf.toFixed(1)+"%";msg("No railway component was detected. Point the camera at the part itself (not at yourself), with good light and a plain background, and capture again. Nothing was saved.");return}
+      if(conf<MIN_CONF){$("#rt").textContent="Unclear";$("#ri").innerHTML="&#10067;";$("#rc").textContent="Confidence: "+conf.toFixed(1)+"%";$("#rb").style.width=conf+"%";msg(`The AI is only ${conf.toFixed(1)}% sure. Move the part closer, improve the light or use a plain background, then retake. Nothing was saved.`);return}
+      const comp=mt[1],res=mt[2]==="Good"?"GOOD":"DAMAGED";
+      const want=f?f.component:$("#cs").value;if(comp!==want){msg(`The image looks like a ${comp}, but ${f?"this fitting is a":"the selected component is"} ${want}. Retake the photo of the correct component. Nothing was saved.`);return}
+      ai={res,conf};$("#rt").textContent=res;$("#rt").style.color=res==="GOOD"?"var(--green)":"var(--red)";$("#ri").innerHTML=res==="GOOD"?"&#9989;":"&#9888;&#65039;";
+      $("#rc").textContent="Confidence: "+conf.toFixed(1)+"%";$("#rb").style.width=conf+"%";$("#rb").className=res==="GOOD"?"good":"bad";if(f)$("#sv2").classList.remove("hide");
+      msg("Analysis complete at "+new Date().toLocaleString()+(f?". Click Save result to keep it on this fitting.":". To save a result, open the fitting below first."))}
+    catch(e){console.error(e);msg("The AI model could not run. Check that public/model/ contains model.json, metadata.json and weights.bin.")}finally{$("#an").disabled=false}};
+  $("#sv2").onclick=async()=>{if(!f)return;const r=await api("POST",`/api/fittings/${f.fitting_id}/inspection`,{result:ai.res,confidence:ai.conf});r.success?(toast("Inspection saved"),reload?reload():V.fitting(f.fitting_id,"inspect")):toast(r.message)}}
+
+/* ---------- boot ---------- */
+(async()=>{const r=await api("GET","/api/me");if(r.success){me=r.user;start()}else showLogin()})();
+</script></body></html>
