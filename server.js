@@ -25,6 +25,10 @@ const need = (...roles) => (req, res, next) => {
 const wrap = fn => (req, res) => fn(req, res).catch(e => { console.error(e); res.status(500).json({ success: false, message: "Server error." }); });
 const bad = (res, m) => res.status(400).json({ success: false, message: m });
 const days = (a, b) => Math.floor((b - a) / 864e5);
+const parseInst = b => { const life = Number(b.expected_life), iv = Number(b.inspect_interval), pcs = Number(b.pieces || 1);
+  if (![life, iv, pcs].every(n => Number.isInteger(n) && n > 0)) return { error: "Expected life, interval and pieces must be positive whole numbers." };
+  if (!b.install_date || !b.zone || !b.station) return { error: "Zone, station and installation date are required." };
+  return { life, iv, pcs }; };
 const today = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); };
 
 async function init() {
@@ -75,11 +79,22 @@ app.post("/api/fittings", need("manufacturer"), wrap(async (req, res) => {
   if (!COMPONENTS.includes(b.component)) return bad(res, "Choose a valid component.");
   const w = b.warranty_months === "" || b.warranty_months == null ? null : Number(b.warranty_months);
   if (w !== null && (!Number.isInteger(w) || w < 0)) return bad(res, "Warranty must be a whole number of months.");
+  let inst = null, v = null;
+  if (b.installation) {
+    if (!["admin", "inspector"].includes(req.session.user.role)) return res.status(403).json({ success: false, message: "Only an inspector or admin can record installation details." });
+    inst = b.installation; v = parseInst(inst); if (v.error) return bad(res, v.error);
+  }
   try {
     await q("INSERT INTO fittings(fitting_id,component,manufacturer,batch,mfg_date,supply_date,warranty_months,created_by) VALUES($1,$2,$3,$4,$5,$6,$7,$8)",
       [id, b.component, b.manufacturer || null, b.batch || null, b.mfg_date || null, b.supply_date || null, w, req.session.user.id]);
   } catch (e) { if (e.code === "23505") return bad(res, "This fitting ID already exists."); throw e; }
   await log(id, "Registered", `${b.component}, batch ${b.batch || "-"}`, req.session.user.username);
+  if (inst) {
+    await q(`INSERT INTO installations(fitting_id,zone,division,station,track,km,installed_by,install_date,pieces,expected_life,inspect_interval,condition,notes)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`, [id, inst.zone, inst.division, inst.station, inst.track, inst.km, inst.installed_by, inst.install_date, v.pcs, v.life, v.iv, inst.condition || "Good", inst.notes || null]);
+    await q("UPDATE fittings SET status='Installed' WHERE fitting_id=$1", [id]);
+    await log(id, "Installed", `${inst.station}, track ${inst.track || "-"}, km ${inst.km || "-"}`, req.session.user.username);
+  }
   res.json({ success: true, fitting_id: id });
 }));
 app.get("/api/fittings", need(), wrap(async (req, res) => {
